@@ -1,0 +1,68 @@
+---
+# tasks file for hadoop-hbase
+- name: Create group hadoop
+  group:
+    name: "{{ hadoop_user }}"
+    state: present
+
+
+- name: Create hadoop user
+  user:
+    name: "{{ hadoop_user  }}"
+    createhome: yes
+    generate_ssh_key: yes
+    password: "{{  hadoop_password }}"
+    state: present
+    group: "{{ hadoop_user }}"
+
+- name: Install java
+  apt:
+   update_cache: yes
+   name: "{{ item }}"
+  with_items:
+    - "{{ hadoop_java_pkg_name }}"
+
+- name: Export env variables
+  lineinfile:
+    path: ~/.profile
+    line: "{{ item }}"
+    state: present
+  with_items:
+    - export JAVA_HOME={{ hadoop_java_home }}
+    - export PATH=$PATH:$JAVA_HOME/bin
+  become: yes
+  become_user: "{{ hadoop_user }}"
+
+- name: Download hadoop
+  get_url:
+    url: "{{ hadoop_download_url }}"
+    dest: /tmp
+- name: Extract file
+  unarchive:
+    src: /tmp/{{ hadoop_pkg_name }}
+    dest: /tmp
+- name: move hadoop files
+  command: mv hadoop-{{ hadoop_pkg_version  }} {{ hadoop_home }}
+  args:
+    chdir: /tmp
+  when: hadoop_move_file  == false
+
+- name: Set the java home in hadoop file
+  lineinfile:
+    path: "{{ hadoop_env_file }}"
+    state: present
+    line: export JAVA_HOME={{ hadoop_java_home }}
+  become: yes
+  become_user: root
+
+- name: Expore hadoop home
+  lineinfile:
+    path: ~/.profile
+    state: present
+    line: "{{ item }}"
+  with_items:
+   - export HADOOP_HOME=/usr/local/hadoop
+   - export PATH=$PATH:$HADOOP_HOME/sbin:$HADOOP_HOME/bin
+  become: yes
+  become_user: "{{ hadoop_user }}"
+

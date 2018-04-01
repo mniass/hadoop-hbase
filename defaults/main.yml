@@ -1,0 +1,14 @@
+---
+# defaults file for hadoop-hbase
+hadoop_user: hadoop
+hadoop_password: hadoop
+hadoop_java_pkg_name:
+  - default-jre
+  - default-jdk
+hadoop_java_home: /usr/lib/jvm/java-1.8.0-openjdk-amd64
+hadoop_download_url: http://apache.mirrors.tds.net/hadoop/common/hadoop-2.8.3/hadoop-2.8.3.tar.gz
+hadoop_pkg_name: hadoop-2.8.3.tar.gz
+hadoop_pkg_version: 2.8.3
+hadoop_home: /usr/local/hadoop/
+hadoop_move_file: true
+hadoop_env_file: /usr/local/hadoop/etc/hadoop/hadoop-env.sh
